@@ -17,7 +17,7 @@ RUN set -ex \
     && make TARGET=linux-glibc \
             USE_OPENSSL=1 \
             USE_ZLIB=1 \
-            USE_PCRE2=1 USE_PCRE2_JIT=1 \
+            USE_PCRE2=1 USE_PCRE2_JIT \
             USE_LUA=1 LUA_LD_FLAGS=-Llua/src LUA_INC=lua/src \
     && make install 
 
