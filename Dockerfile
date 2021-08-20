@@ -4,9 +4,7 @@ WORKDIR /build
 
 RUN set -ex \
     && yum --assumeyes update \
-    && yum --assumeyes install gcc make wget diffutils openssl-devel zlib-devel pcre-devel \
-    && groupadd haproxy \
-    && useradd --gid haproxy haproxy
+    && yum --assumeyes install gcc make wget diffutils openssl-devel zlib-devel pcre-devel
 
 RUN set -ex \
     && wget --output-document lua.tgz http://www.lua.org/ftp/lua-5.4.3.tar.gz \
@@ -33,6 +31,8 @@ COPY --from=BUILD /usr/local /usr/local
 COPY docker-entrypoint.sh /usr/local/bin
 COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
 RUN set -ex \
+    && groupadd haproxy \
+    && useradd --gid haproxy haproxy \
     && chmod +x /usr/local/bin/docker-entrypoint.sh
 STOPSIGNAL SIGUSR1
 ENTRYPOINT [ "docker-entrypoint.sh" ]
