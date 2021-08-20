@@ -29,8 +29,11 @@ RUN set -ex \
 FROM registry.access.redhat.com/ubi8/ubi-minimal AS IMAGE
 COPY --from=BUILD /usr/local /usr/local
 COPY docker-entrypoint.sh /usr/local/bin
-COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+COPY haproxy.cfg /usr/local/etc/haproxy/
+COPY pub1.pem /usr/local/etc/haproxy/
 RUN set -ex \
+    && microdnf update \
+    && microdnf install shadow-utils \
     && groupadd haproxy \
     && useradd --gid haproxy haproxy \
     && chmod +x /usr/local/bin/docker-entrypoint.sh
