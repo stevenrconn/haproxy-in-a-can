@@ -1,7 +1,7 @@
 source "docker" "haproxy-nist" {
     image = "registry.access.redhat.com/ubi8/ubi:latest"
     pull = true
-    export_path = "haproxy-nist.tar"
+    discard = true
     changes = [
         "EXPOSE 80 443 8181",
         "ENTRYPOINT [ \"/docker-entrypoint.sh\" ]",
@@ -9,24 +9,24 @@ source "docker" "haproxy-nist" {
         "USER haproxy",
         "LABEL haproxy-nist-version=0"
     ]
-    run_command = [ 
-        "--entrypoint=/bin/sh",
-        "--stop-signal=SIGUSR1", 
-        "-d", "-i", "-t", "--", 
-        "{{.Image}}"
-    ]
+    // run_command = [ 
+    //     "--entrypoint=/bin/sh",
+    //     "--stop-signal=SIGUSR1", 
+    //     "-d", "-i", "-t", "--", 
+    //     "{{.Image}}"
+    // ]
 }
 
 build {
     sources = [ "source.docker.haproxy-nist" ]
-    provisioner "file" {
-        sources = [
-            "haproxy.cfg",
-            "pub1.pem",
-            "docker-entrypoint.sh"
-        ]
-        destination = "/tmp/"
-    }
+    // provisioner "file" {
+    //     sources = [
+    //         "haproxy.cfg",
+    //         "pub1.pem",
+    //         "docker-entrypoint.sh"
+    //     ]
+    //     destination = "/tmp/"
+    // }
     provisioner "shell" {
         inline = [
             "yum --assumeyes update",
@@ -39,16 +39,28 @@ build {
             "tar --extract --file /build/haproxy.tgz --strip-components=1 --directory /build --verbose",
             "make --directory /build TARGET=linux-glibc USE_OPENSSL=1 USE_ZLIB=1 USE_PCRE2=1 USE_PCRE2_JIT=1 USE_LUA=1 LUA_LD_FLAGS=-Llua/src LUA_INC=lua/src",
             "make --directory /build install",
-            "rm -rf /build",
-            "yum --assumeyes history undo last",
-            "mkdir --parents /usr/local/etc/haproxy",
-            "mv /tmp/haproxy.cfg /tmp/pub1.pem /usr/local/etc/haproxy",
-            "mv /tmp/docker-entrypoint.sh /"
+            "tar --create --file /tmp/haproxy-usr-local.tar --verbose /usr/local"
         ]
     }
 
-    post-processor "docker-import" {
-        repository = "local/haproxy-nist"
-        tag = "latest"
+    provisioner "file" {
+        source = "/tmp/haproxy-usr-local.tar"
+        destination = "haproxy-usr-local.tar"
+        direction = "download"
     }
+
+    // provisioner "shell" {
+    //     inline = [
+    //         "rm -rf /build",
+    //         "yum --assumeyes history undo last",
+    //         "mkdir --parents /usr/local/etc/haproxy",
+    //         "mv /tmp/haproxy.cfg /tmp/pub1.pem /usr/local/etc/haproxy",
+    //         "mv /tmp/docker-entrypoint.sh /"
+    //     ]
+    // }
+
+    // post-processor "docker-import" {
+    //     repository = "local/haproxy-nist"
+    //     tag = "latest"
+    // }
 }
