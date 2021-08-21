@@ -1,18 +1,32 @@
-source "docker" "haproxy" {
+source "docker" "haproxy-nist" {
     image = "registry.access.redhat.com/ubi8/ubi:latest"
+    pull = true
+    export_path = "haproxy-nist.tar"
     changes = [
         "EXPOSE 80 443 8181",
-        "STOPSIGNAL SIGUSR1",
         "ENTRYPOINT [ \"/docker-entrypoint.sh\" ]",
         "CMD [ \"haproxy\", \"-f\", \"/usr/local/etc/haproxy/haproxy.cfg\" ]",
         "USER haproxy",
-        "LABEL haproxy-nist-0"
+        "LABEL haproxy-nist-version=0"
     ]
-    export_path = "haproxy-nist-0-image.tar"
+    run_command = [ 
+        "--entrypoint=/bin/sh",
+        "--stop-signal=SIGUSR1", 
+        "-d", "-i", "-t", "--", 
+        "{{.Image}}"
+    ]
 }
 
 build {
-    sources = [ "source.docker.haproxy" ]
+    sources = [ "source.docker.haproxy-nist" ]
+    provisioner "file" {
+        sources = [
+            "haproxy.cfg",
+            "pub1.pem",
+            "docker-entrypoint.sh"
+        ]
+        destination = "/tmp/"
+    }
     provisioner "shell" {
         inline = [
             "yum --assumeyes update",
@@ -26,7 +40,15 @@ build {
             "make --directory /build TARGET=linux-glibc USE_OPENSSL=1 USE_ZLIB=1 USE_PCRE2=1 USE_PCRE2_JIT=1 USE_LUA=1 LUA_LD_FLAGS=-Llua/src LUA_INC=lua/src",
             "make --directory /build install",
             "rm -rf /build",
-            "yum --assumeyes history undo last"
+            "yum --assumeyes history undo last",
+            "mkdir --parents /usr/local/etc/haproxy",
+            "mv /tmp/haproxy.cfg /tmp/pub1.pem /usr/local/etc/haproxy",
+            "mv /tmp/docker-entrypoint.sh /"
         ]
+    }
+
+    post-processor "docker-import" {
+        repository = "local/haproxy-nist"
+        tag = "latest"
     }
 }
