@@ -10,3 +10,10 @@ To build the HAProxy image, run the following command:
 ```
 packer build -parallel-builds=1 .
 ```
+
+To run the container, use something like:
+```
+docker run --detach --name haproxy-run --volume /path/to/config/:/usr/local/etc/haproxy/ \
+           --publish 80:80 --publish 443:443 haproxy:latest
+```
+where /path/to/config/ is the location of your HAProxy configuration files.
