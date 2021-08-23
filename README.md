@@ -24,10 +24,11 @@ where /path/to/config/ is the location of your HAProxy configuration files.
 The file `config.auto.pkrvars.hcl` contains several variables used to configure the build
 process:
 
------|-----
-`lua_url`|URL of the LUA TAR archive
-`lua_checksum`|SHA1 checksum of LUA TAR archive
-`haproxy_url`|URL of the HAProxy TAR archive
-`haproxy_checksum`|MD5 checksum of HAProxy tar archive
-`haproxy_version`|used as the tag for the image
-`repository`|repository/name of the image
+|Variable|Definition|
+|-----|-----|
+|`lua_url`|URL of the LUA TAR archive|
+|`lua_checksum`|SHA1 checksum of LUA TAR archive|
+|`haproxy_url`|URL of the HAProxy TAR archive|
+|`haproxy_checksum`|MD5 checksum of HAProxy tar archive|
+|`haproxy_version`|used as the tag for the image|
+|`repository`|repository/name of the image|
