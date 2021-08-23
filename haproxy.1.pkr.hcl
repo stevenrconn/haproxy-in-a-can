@@ -1,3 +1,10 @@
+variable "haproxy_version" {
+    type = string
+}
+variable "repository" {
+    type = string
+}
+
 source "docker" "haproxy-image" {
     image = "registry.access.redhat.com/ubi8/ubi-minimal:latest"
     pull = true
@@ -6,7 +13,6 @@ source "docker" "haproxy-image" {
         "EXPOSE 80 443 8181",
         "ENTRYPOINT [ \"/docker-entrypoint.sh\" ]",
         "CMD [ \"haproxy\", \"-f\", \"/usr/local/etc/haproxy/haproxy.cfg\" ]",
-        "LABEL haproxy-nist-version=0.0"
     ]
     run_command = [ 
         "--entrypoint=/bin/sh",
@@ -42,7 +48,7 @@ build {
         ]
     }
     post-processor "docker-tag" {
-        repository = "local/haproxy-nist"
-        tags = [ "0.0", "latest" ]
+        repository = "${var.repository}"
+        tags = [ "${var.haproxy_version}", "latest" ]
     }    
 }
