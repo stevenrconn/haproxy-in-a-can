@@ -3,12 +3,6 @@
 Builds an HAProxy container image using the Red Hat 8 Universal Base Images (UBIs). 
 
 ## Building the container image using Docker
-The Packer build proceeds in two stages:
-1. Create a ubi container to download source packages for HAProxy and LUA, build them and
-export the compiled code as a tar file.
-2. Create the HAProxy image by importing the code compiled in step 1 into a ubi-minimal
-container, apply additional configuration and push the resulting image out to a repository.
-
 To build the HAProxy container image using Docker, use the following command:
 ```
 docker build --tag haproxy-ubi:<version> .
@@ -16,6 +10,12 @@ docker build --tag haproxy-ubi:<version> .
 where <version> is the release number of the HAProxy build.
 
 ## Building and pushing the container image using Packer
+The Packer build proceeds in two stages:
+1. Create a ubi container to download source packages for HAProxy and LUA, build them and
+export the compiled code as a tar file.
+2. Create the HAProxy image by importing the code compiled in step 1 into a ubi-minimal
+container, apply additional configuration and push the resulting image out to a repository.
+
 To build and push the HAProxy image using Packer, run the following command:
 ```
 packer build -parallel-builds=1 .
