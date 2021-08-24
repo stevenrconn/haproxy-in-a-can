@@ -47,8 +47,11 @@ build {
             "mv /tmp/haproxy.cfg /tmp/pub1.pem /usr/local/etc/haproxy",
         ]
     }
-    post-processor "docker-tag" {
-        repository = "${var.repository}"
-        tags = [ "${var.haproxy_version}", "latest" ]
-    }    
+    post-processors {
+        post-processor "docker-tag" {
+            repository = "${var.repository}"
+            tags = [ "${var.haproxy_version}", "latest" ]
+        } 
+        post-processor "docker-push" {}
+    }   
 }
