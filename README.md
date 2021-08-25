@@ -1,6 +1,7 @@
 # haproxy-in-a-can
 
-Builds an HAProxy container image using the Red Hat 8 Universal Base Images (UBIs). 
+Builds an HAProxy container image using the Red Hat 8 Universal Base Images (UBIs). This repo contains both a Dockerfile
+and a Packer build script.
 
 ## Building the container image using Docker
 To build the HAProxy container image using Docker, use the following command:
@@ -8,6 +9,14 @@ To build the HAProxy container image using Docker, use the following command:
 docker build --tag haproxy-ubi:<version> .
 ```
 where <version> is the release number of the HAProxy build.
+
+### Docker build arguments
+You may set the following build arguments using the `--build-args` option:
+|Variable|Definition|
+|-----|-----|
+|`haproxy_version_major`|The first two parts of the HAProxy version (default 2.4)|
+|`haproxy_version_minor`|The last part of the HAProxy version (default 3)|
+|`lua_version`|LUA version (default 5.4.3)|
 
 ## Building and pushing the container image using Packer
 The Packer build proceeds in two stages:
