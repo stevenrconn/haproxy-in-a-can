@@ -8,7 +8,7 @@ To build the HAProxy container image using Docker, use the following command:
 ```
 docker build --tag haproxy-ubi:<version> .
 ```
-where <version> is the release number of the HAProxy build.
+where `<version>` is the release number of the HAProxy build.
 
 ### Docker build arguments
 You may set the following build arguments using the `--build-args` option:
