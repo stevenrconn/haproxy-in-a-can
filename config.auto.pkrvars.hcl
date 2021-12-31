@@ -1,6 +1,18 @@
-lua_url          = "http://www.lua.org/ftp/lua-5.4.3.tar.gz"
-lua_checksum     = "1dda2ef23a9828492b4595c0197766de6e784bc7"
-haproxy_url      = "https://www.haproxy.org/download/2.4/src/haproxy-2.4.3.tar.gz"
-haproxy_checksum = "def6b4113c44dde1820494505a55195f"
-haproxy_version  = "2.4.3"
-repository       = "registry/repo/haproxy-ubi"
+base_image_registry     = "registry.access.redhat.com/ubi8/ubi"
+base_image_tag          = "8.5"
+
+haproxy_image_registry  = ""
+haproxy_image_tag       = ""
+
+haproxy_release_major   = "2.4"
+haproxy_release_minor   = "10"
+haproxy_sha512          = ""
+
+lua_release             = "5.4.3"
+lua_sha512              = ""
+
+openssl_release         = "3.0.1"
+openssl_sha512          = ""
+
+pcre2_release           = "10.93"
+pcre2_sha512            = ""

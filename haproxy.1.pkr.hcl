@@ -1,12 +1,5 @@
-variable "haproxy_version" {
-    type = string
-}
-variable "repository" {
-    type = string
-}
-
 source "docker" "haproxy-image" {
-    image = "registry.access.redhat.com/ubi8/ubi-minimal:latest"
+    image = "${var.base_image_registry}-minimal:${var.base_image_tag}"
     pull = true
     commit = true
     changes = [
@@ -24,33 +17,43 @@ source "docker" "haproxy-image" {
 
 build {
     sources = [ "source.docker.haproxy-image" ]
+
     provisioner "file" {
         sources = [
-            "haproxy.cfg",
-            "pub1.pem",
-            "docker-entrypoint.sh",
-            "haproxy-usr-local.tar"
+            "${path.root}/haproxy.cfg",
+            "${path.root}/pub1.pem",
+            "${path.root}/docker-entrypoint.sh"
         ]
         destination = "/tmp/"
     }
+
+    provisioner "file" {
+        source = "${path.root}/haproxy.tar.gz"
+        destination = "/tmp/"
+        generated = true
+    }
+
     provisioner "shell" {
         inline = [
             "set -eux",
             "microdnf update",
-            "microdnf install shadow-utils tar",
+            "microdnf install shadow-utils",
+
             "groupadd haproxy",
             "useradd --gid haproxy haproxy",
-            "tar --extract --file /tmp/haproxy-usr-local.tar --directory /",
-            "mv /tmp/docker-entrypoint.sh /",
+
+            "tar --extract --gunzip --file /tmp/haproxy.tar.gz --directory /",
+            "cp /tmp/docker-entrypoint.sh /",
             "chmod +x /docker-entrypoint.sh",
-            "mkdir --parents /usr/local/etc/haproxy",
-            "mv /tmp/haproxy.cfg /tmp/pub1.pem /usr/local/etc/haproxy",
+            "cp /tmp/{haproxy.cfg,pub1.pem,haproxy.cfg} /usr/local/etc/haproxy/",
+            "rm /tmp/{haproxy.tar.gz,docker-entrypoint.sh,pub1.pem,haproxy.cfg}"
         ]
     }
+
     post-processors {
         post-processor "docker-tag" {
-            repository = "${var.repository}"
-            tags = [ "${var.haproxy_version}", "latest" ]
+            repository = "${var.haproxy_image_registry}"
+            tags = [ "${var.haproxy_image_tag}", "latest" ]
         } 
         post-processor "docker-push" {}
     }   
