@@ -37,7 +37,7 @@ build {
         inline = [
             "set -eux",
             "microdnf update",
-            "microdnf install shadow-utils",
+            "microdnf install gzip tar shadow-utils",
 
             "groupadd haproxy",
             "useradd --gid haproxy haproxy",
@@ -45,6 +45,7 @@ build {
             "tar --extract --gunzip --file /tmp/haproxy.tar.gz --directory /",
             "cp /tmp/docker-entrypoint.sh /",
             "chmod +x /docker-entrypoint.sh",
+            "mkdir --parents /usr/local/etc/haproxy",
             "cp /tmp/{haproxy.cfg,pub1.pem,haproxy.cfg} /usr/local/etc/haproxy/",
             "rm /tmp/{haproxy.tar.gz,docker-entrypoint.sh,pub1.pem,haproxy.cfg}"
         ]
@@ -53,7 +54,9 @@ build {
     post-processors {
         post-processor "docker-tag" {
             repository = "${var.haproxy_image_registry}"
-            tags = [ "${var.haproxy_image_tag}", "latest" ]
+            tags = [ 
+                "${var.haproxy_release_major}.${var.haproxy_release_minor}.${var.haproxy_image_release}" 
+            ]
         } 
         post-processor "docker-push" {}
     }   

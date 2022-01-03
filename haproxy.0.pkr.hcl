@@ -31,7 +31,7 @@ build {
             "echo \"${var.lua_sha512} */tmp/lua.tgz\" | shasum --check --algorithm 512 -",
             "curl --output /tmp/openssl.tgz ${local.openssl_url}",
             "echo \"${var.openssl_sha512} */tmp/openssl.tgz\" | shasum --check --algorithm 512 -",
-            "curl --output /tmp/pcre2.tgz ${local.pcre2_url}",
+            "curl --output /tmp/pcre2.tgz --location ${local.pcre2_url}",
             "echo \"${var.pcre2_sha512} */tmp/pcre2.tgz\" | shasum --check --algorithm 512 -",
 
             "mkdir /build",
@@ -43,7 +43,7 @@ build {
 
             "tar --extract --gunzip --strip-components=1 --file /tmp/openssl.tgz --directory /build",
             "./config no-shared enable-fips",
-            "make && make install_sw && make install_fips",
+            "make && make test && make install_sw && make install_fips",
             "rm --recursive --force *",
 
             "tar --extract --gunzip --strip-components=1 --file /tmp/pcre2.tgz --directory /build",

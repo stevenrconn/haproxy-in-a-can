@@ -8,7 +8,7 @@ variable "base_image_tag" {
 variable "haproxy_image_registry" {
     type = string 
 }
-variable "haproxy_image_tag" { 
+variable "haproxy_image_release" { 
     type = string 
 }
 
