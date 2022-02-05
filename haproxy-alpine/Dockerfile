@@ -10,20 +10,43 @@ WORKDIR /tmp
 RUN set -eux \
     && apk update \
     && apk upgrade \
-    && apk add make gcc perl tar musl-dev linux-headers
+    && apk add make gcc perl patch musl-dev linux-headers
 
-COPY sha512sums.txt /tmp/
+COPY sha512sums.txt ssl_sock.c.patch /tmp/
 RUN set -eux \
     && wget ${HAPROXY24_URL} \
     && wget ${LUA5_URL} \
     && wget ${OPENSSL3_URL} \
     && wget ${PCRE2_URL} \
-    && sha512sum -c sha512sums.txt
+    && sha512sum sha512sums.txt
 
-    # && echo "${OPENSSL3_SHA512} *openssl.tgz" | sha512sum -s \
-    # && tar --extract --gunzip --strip-components=1 --file openssl.tgz --directory . \
-    # && ./config enable-fips no-shared \
-    # && make \
-    # && make install_sw \
-    # && make install_fips \
-    # && rm -rf *
+RUN set -eux \
+    && tar -xzvf lua* \
+    && cd lua* \
+    && make all test \
+    && make install
+
+RUN set -eux \
+    && tar -xzvf openssl* \
+    && cd openssl* \
+    && ./config enable-fips no-shared \
+    && make \
+    && make install_sw \
+    && make install_fips
+
+RUN set -eux \
+    && tar -xzvf pcre2* \
+    && cd pcre2* \
+    && ./configure --disable-shared --enable-jit \
+    && make \
+    && make install
+
+RUN set -eux \
+    && tar -xzf haproxy* \
+    && cd haproxy* \
+    && patch src/ssl_sock.c ../ssl_sock.c.patch \
+    && make TARGET=linux-musl \
+            USE_LUA=1 \
+            USE_PCRE2=1 USE_PCRE2_STATIC=1 USE_PCRE2_JIT=1 \
+            USE_OPENSSL=1 \
+    && make install
