@@ -1,4 +1,4 @@
-FROM alpine:3.15 AS build
+FROM alpine:3.15 AS package
 
 ENV HAPROXY24_URL "https://www.haproxy.org/download/2.4/src/haproxy-2.4.12.tar.gz"
 ENV LUA5_URL      "http://www.lua.org/ftp/lua-5.4.4.tar.gz"
