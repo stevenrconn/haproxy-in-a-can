@@ -1,4 +1,4 @@
-FROM alpine:3.15
+FROM alpine:3.15 AS build
 
 ENV HAPROXY24_URL "https://www.haproxy.org/download/2.4/src/haproxy-2.4.12.tar.gz"
 ENV LUA5_URL      "http://www.lua.org/ftp/lua-5.4.4.tar.gz"
@@ -50,3 +50,14 @@ RUN set -eux \
             USE_PCRE2=1 USE_PCRE2_STATIC=1 USE_PCRE2_JIT=1 \
             USE_OPENSSL=1 \
     && make install
+
+FROM alpine:3.15 AS image
+
+RUN set -eux \
+    && apk update \
+    && apk upgrade
+
+COPY --from=build /usr/local/ /usr/local/
+
+CMD [ "haproxy", "-vv" ]
+
