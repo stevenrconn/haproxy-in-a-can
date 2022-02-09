@@ -30,6 +30,6 @@ RUN set -eux \
         USE_OPENSSL=1 \
         USE_PCRE2=1 USE_PCRE2_STATIC=1 USE_PCRE2_JIT=1 \
         USE_LUA=1 \
-    && make install
+    && make --directory haproxy install
 
 CMD [ "/usr/local/sbin/haproxy", "-vv" ]
